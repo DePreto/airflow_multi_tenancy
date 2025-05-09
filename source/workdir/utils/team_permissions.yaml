@@ -1,0 +1,6 @@
+team_beta:
+  - can_read
+  - can_edit
+  - can_delete
+team_beta_read:
+  - can_read

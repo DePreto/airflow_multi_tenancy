@@ -1,0 +1,82 @@
+x-airflow-common:
+  &airflow-common
+  build:
+    context: ./airflow_build
+  env_file:
+    - .env
+  volumes:
+    - ./source/dags:/opt/airflow/dags
+    - ./source/logs:/opt/airflow/logs
+    - ./source/workdir:/opt/airflow/workdir
+    - ./airflow_local_settings.py:/opt/airflow/airflow_local_settings.py
+    - ./airflow_build/configs:/opt/airflow/configs
+  user: "${AIRFLOW_UID:-50000}:0" # GID should be 0
+  networks:
+    - airflow_network
+  depends_on:
+    &airflow-common-depends-on
+    postgres:
+      condition: service_healthy
+
+services:
+  postgres:
+    image: postgres:15.2
+    env_file:
+      - .env
+    volumes:
+      - postgres-db-volume:/var/lib/postgresql/data
+    networks:
+      - airflow_network
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: always
+    ports:
+      - "5435:5432"
+
+  airflow-webserver:
+    <<: *airflow-common
+    command: webserver
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+    restart: always
+    depends_on:
+      <<: *airflow-common-depends-on
+    ports:
+      - "8081:8080"
+
+  airflow-scheduler:
+    <<: *airflow-common
+    command: scheduler
+    healthcheck:
+      test: ["CMD-SHELL", 'airflow jobs check --job-type SchedulerJob --hostname "$${HOSTNAME}"']
+      interval: 15s
+      timeout: 10s
+      retries: 10
+    restart: always
+    depends_on:
+      <<: *airflow-common-depends-on
+
+  prepare_test_env-init:
+    <<: *airflow-common
+    command: bash -c "bash /opt/airflow/configs/prepare_test_env.sh"
+    depends_on:
+      airflow-webserver:
+        condition: service_healthy
+
+
+volumes:
+  postgres-db-volume:
+
+networks:
+  airflow_network:
+    driver: bridge
+    ipam:
+     config:
+       - subnet: 172.20.0.0/16
+         gateway: 172.20.0.1
