@@ -66,5 +66,5 @@ def task_policy(task: BaseOperator) -> None:
     """
     dag_parent_folder = Path(task.dag.fileloc).parent.name
 
-    if dag_parent_folder == 'dags_team_bi':
-        task.pool = 'team_bi_pool'
+    if dag_parent_folder == 'dags_team_beta':
+        task.pool = 'team_beta_pool'
