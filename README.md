@@ -30,7 +30,12 @@ One-time actions required for the first-time project setup.
    docker compose -f ./docker-compose.yaml build
    ```
 
-2. **Start the environment**:
+2. **Use default env params**
+   ```shell
+   cp ./mock.env ./.env
+   ```
+
+3. **Start the environment**:
    ```shell
    docker compose -f ./docker-compose.yaml up -d
    ```
