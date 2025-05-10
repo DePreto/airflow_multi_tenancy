@@ -18,7 +18,12 @@ One-time actions required for the first-time project setup.
    git clone git@github.com:DePreto/airflow_multi_tenancy.git && cd airflow_multi_tenancy/
    ```
 
-2. **Configure Airflow user** (prevents container permission issues, especially with volumes):
+2. **Use default env params**
+   ```shell
+   cp ./mock.env ./.env
+   ```
+
+3. **Configure Airflow user** (prevents container permission issues, especially with volumes):
    ```shell
    mkdir -p ./source/logs &&
    echo -e "AIRFLOW_UID=$(id -u)" >> ./.env
@@ -30,12 +35,7 @@ One-time actions required for the first-time project setup.
    docker compose -f ./docker-compose.yaml build
    ```
 
-2. **Use default env params**
-   ```shell
-   cp ./mock.env ./.env
-   ```
-
-3. **Start the environment**:
+2. **Start the environment**:
    ```shell
    docker compose -f ./docker-compose.yaml up -d
    ```
