@@ -73,9 +73,6 @@ One-time actions required for the first-time project setup.
 - Edit `team_permissions.yaml` to add/modify team roles and permissions.
 - Manually add tags to DAGs (`tags=["team_beta_read"]`) for cross-team access.
 
-
-Here's the polished English version for your "Stopping docker-compose" section:
-
 ---
 
 ## Stopping the Environment
